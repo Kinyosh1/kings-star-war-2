@@ -159,9 +159,10 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-40 overflow-y-auto bg-black/80 backdrop-blur-sm"
           >
-            <div className="max-w-4xl w-full p-8 text-center flex flex-col items-center">
+            <div className="min-h-full w-full p-8 flex flex-col items-center justify-center">
+              <div className="max-w-4xl w-full text-center flex flex-col items-center">
               <motion.div
                 initial={{ scale: 0.8, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
@@ -229,7 +230,8 @@ export default function App() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
+        </motion.div>
         )}
 
         {gameState === 'PAUSED' && (
@@ -237,17 +239,19 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 backdrop-blur-md"
+            className="fixed inset-0 z-40 overflow-y-auto bg-black/60 backdrop-blur-md"
           >
-            <div className="glass p-12 rounded-[3rem] text-center max-w-sm w-full">
-              <h2 className="text-4xl font-display font-bold mb-8 uppercase">{t.missionPaused}</h2>
-              <div className="flex flex-col gap-4">
-                <button onClick={() => setGameState('PLAYING')} className="btn-primary w-full">
-                  <Play className="w-5 h-5 fill-current" /> {t.resume}
-                </button>
-                <button onClick={() => setGameState('START')} className="px-8 py-3 bg-white/10 hover:bg-white/20 rounded-full font-bold transition-all uppercase">
-                  {t.abort}
-                </button>
+            <div className="min-h-full w-full p-8 flex flex-col items-center justify-center">
+              <div className="glass p-12 rounded-[3rem] text-center max-w-sm w-full">
+                <h2 className="text-4xl font-display font-bold mb-8 uppercase">{t.missionPaused}</h2>
+                <div className="flex flex-col gap-4">
+                  <button onClick={() => setGameState('PLAYING')} className="btn-primary w-full">
+                    <Play className="w-5 h-5 fill-current" /> {t.resume}
+                  </button>
+                  <button onClick={() => setGameState('START')} className="px-8 py-3 bg-white/10 hover:bg-white/20 rounded-full font-bold transition-all uppercase">
+                    {t.abort}
+                  </button>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -258,9 +262,10 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 flex items-center justify-center bg-red-950/40 backdrop-blur-xl"
+            className="fixed inset-0 z-40 overflow-y-auto bg-red-950/40 backdrop-blur-xl"
           >
-            <div className="max-w-4xl w-full p-8">
+            <div className="min-h-full w-full p-8 flex flex-col items-center justify-center">
+              <div className="max-w-4xl w-full">
               <div className="text-center mb-12">
                 <h2 className="text-6xl md:text-8xl font-display font-black text-red-500 mb-2 uppercase">{t.missionFailed}</h2>
                 <p className="text-white/60 uppercase tracking-[0.4em]">{t.shipDestroyed}</p>
@@ -319,19 +324,20 @@ export default function App() {
                 </button>
               </div>
             </div>
-          </motion.div>
-        )}
+          </div>
+        </motion.div>
+      )}
       </AnimatePresence>
 
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:block fixed right-6 top-1/2 -translate-y-1/2 z-[60]">
+      {/* Mission Intel Sidebar/Modal */}
+      <div className="fixed right-6 bottom-24 lg:top-1/2 lg:-translate-y-1/2 z-[60]">
         <AnimatePresence>
           {(showSidebar && (gameState === 'PLAYING' || gameState === 'PAUSED')) ? (
             <motion.div
               initial={{ x: 400, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: 400, opacity: 0 }}
-              className="glass-dark w-72 p-8 rounded-[2.5rem] relative max-h-[90vh] overflow-y-auto"
+              className="glass-dark fixed inset-4 lg:inset-auto lg:relative w-auto lg:w-72 p-8 rounded-[2.5rem] z-[70] overflow-y-auto max-h-[90vh]"
             >
               <button 
                 onClick={() => setShowSidebar(false)}
