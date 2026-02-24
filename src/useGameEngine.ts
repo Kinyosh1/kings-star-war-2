@@ -167,8 +167,11 @@ export function useGameEngine() {
       player.update(keysRef.current, canvas.width, canvas.height, deltaTime);
       player.draw(ctx);
 
-      // Shooting - Auto-fire in PLAYING state for mobile support
-      if (time % 150 < 20) {
+      // Shooting - Auto-fire on mobile, Space key on desktop
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const shouldShoot = (isMobile || keysRef.current.has(' ')) && time % 150 < 20;
+      
+      if (shouldShoot) {
         if (player.tripleShot) {
           bulletsRef.current.push(new Bullet(player.x, player.y - 20, -0.2));
           bulletsRef.current.push(new Bullet(player.x, player.y - 20, 0));
