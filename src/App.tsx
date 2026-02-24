@@ -39,7 +39,7 @@ export default function App() {
     playerRef
   } = useGameEngine();
 
-  const [showSidebar, setShowSidebar] = useState(true);
+  const [showSidebar, setShowSidebar] = useState(false);
   const [lang, setLang] = useState<'en' | 'zh'>('zh');
   const t = TRANSLATIONS[lang];
 
@@ -341,7 +341,7 @@ export default function App() {
             >
               <button 
                 onClick={() => setShowSidebar(false)}
-                className="absolute top-4 right-4 text-white/40 hover:text-white"
+                className="absolute top-4 left-4 text-white/40 hover:text-white"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -454,7 +454,10 @@ export default function App() {
             </motion.div>
           ) : (gameState === 'PLAYING' || gameState === 'PAUSED') && (
             <button 
-              onClick={() => setShowSidebar(true)}
+              onClick={() => {
+                setShowSidebar(true);
+                if (gameState === 'PLAYING') setGameState('PAUSED');
+              }}
               className="glass p-4 rounded-full hover:bg-white/20 transition-all"
             >
               <Info className="w-6 h-6" />
