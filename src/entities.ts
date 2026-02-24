@@ -8,13 +8,17 @@ export class Player {
   width: number = 40;
   height: number = 40;
   speed: number = 7;
+  baseSpeed: number = 7;
   lives: number = 3;
+  maxLives: number = 3;
   score: number = 0;
   invincible: boolean = false;
   invincibleTimer: number = 0;
   shield: boolean = false;
   tripleShot: boolean = false;
   tripleShotTimer: number = 0;
+  damageBoost: boolean = false;
+  damageBoostTimer: number = 0;
   image: HTMLImageElement | null = null;
   
   constructor(canvasWidth: number, canvasHeight: number) {
@@ -27,15 +31,17 @@ export class Player {
     img.onload = () => { this.image = img; };
   }
 
-  update(keys: Set<string>, canvasWidth: number, canvasHeight: number, deltaTime: number) {
-    if (keys.has('arrowleft') || keys.has('a')) this.x -= this.speed;
-    if (keys.has('arrowright') || keys.has('d')) this.x += this.speed;
-    if (keys.has('arrowup') || keys.has('w')) this.y -= this.speed;
-    if (keys.has('arrowdown') || keys.has('s')) this.y += this.speed;
+  update(keys: Set<string>, canvasWidth: number, canvasWidth_ignored: number, deltaTime: number) {
+    const currentSpeed = this.baseSpeed;
+    
+    if (keys.has('arrowleft') || keys.has('a')) this.x -= currentSpeed;
+    if (keys.has('arrowright') || keys.has('d')) this.x += currentSpeed;
+    if (keys.has('arrowup') || keys.has('w')) this.y -= currentSpeed;
+    if (keys.has('arrowdown') || keys.has('s')) this.y += currentSpeed;
 
     // Boundaries
     this.x = Math.max(this.width / 2, Math.min(canvasWidth - this.width / 2, this.x));
-    this.y = Math.max(this.height / 2, Math.min(canvasHeight - this.height / 2, this.y));
+    this.y = Math.max(this.height / 2, Math.min(window.innerHeight - this.height / 2, this.y));
 
     // Timers
     if (this.invincibleTimer > 0) {
@@ -46,6 +52,11 @@ export class Player {
     if (this.tripleShotTimer > 0) {
       this.tripleShotTimer -= deltaTime;
       if (this.tripleShotTimer <= 0) this.tripleShot = false;
+    }
+
+    if (this.damageBoostTimer > 0) {
+      this.damageBoostTimer -= deltaTime;
+      if (this.damageBoostTimer <= 0) this.damageBoost = false;
     }
   }
 
@@ -66,6 +77,15 @@ export class Player {
       ctx.stroke();
       ctx.fillStyle = 'rgba(139, 92, 246, 0.2)';
       ctx.fill();
+    }
+
+    // Damage boost glow
+    if (this.damageBoost) {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.width * 0.7, 0, Math.PI * 2);
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2;
+      ctx.stroke();
     }
 
     ctx.translate(this.x, this.y);
@@ -139,16 +159,46 @@ export class Bullet {
   }
 }
 
+export class EnemyBullet {
+  x: number;
+  y: number;
+  speed: number = 5;
+  radius: number = 4;
+
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
+
+  update() {
+    this.y += this.speed;
+  }
+
+  draw(ctx: CanvasRenderingContext2D) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = '#ef4444';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#ef4444';
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
 export class Enemy {
   x: number;
   y: number;
   config: EnemyConfig;
   hp: number;
+  maxHp: number;
   image: HTMLImageElement | null = null;
+  fireTimer: number = 0;
   
-  constructor(canvasWidth: number, config: EnemyConfig) {
+  constructor(canvasWidth: number, config: EnemyConfig, hpMultiplier: number = 1) {
     this.config = config;
-    this.hp = config.hp;
+    this.maxHp = Math.ceil(config.hp * hpMultiplier);
+    this.hp = this.maxHp;
     this.x = Math.random() * (canvasWidth - config.size * 2) + config.size;
     this.y = -config.size;
 
@@ -158,8 +208,21 @@ export class Enemy {
     img.onload = () => { this.image = img; };
   }
 
-  update() {
-    this.y += this.config.speed;
+  update(playerX: number, playerY: number, deltaTime: number) {
+    if (this.config.type === 'KAMIKAZE') {
+      // Track player
+      const dx = playerX - this.x;
+      const dy = playerY - this.y;
+      const angle = Math.atan2(dy, dx);
+      this.x += Math.cos(angle) * this.config.speed;
+      this.y += Math.sin(angle) * this.config.speed;
+    } else {
+      this.y += this.config.speed;
+    }
+
+    if (this.config.type === 'SHOOTER') {
+      this.fireTimer += deltaTime;
+    }
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -174,12 +237,26 @@ export class Enemy {
       ctx.shadowBlur = 15;
       ctx.shadowColor = this.config.glowColor;
 
-      // Draw Enemy Ship (Diamond/Hexagon shape)
+      // Draw Enemy Ship
       ctx.beginPath();
-      ctx.moveTo(0, this.config.size);
-      ctx.lineTo(this.config.size, 0);
-      ctx.lineTo(0, -this.config.size);
-      ctx.lineTo(-this.config.size, 0);
+      if (this.config.type === 'KAMIKAZE') {
+        // Pointy triangle for kamikaze
+        ctx.moveTo(0, this.config.size);
+        ctx.lineTo(this.config.size / 2, -this.config.size);
+        ctx.lineTo(-this.config.size / 2, -this.config.size);
+      } else if (this.config.type === 'SHOOTER') {
+        // Hexagon for shooter
+        for (let i = 0; i < 6; i++) {
+          const angle = (i * Math.PI) / 3;
+          ctx.lineTo(Math.cos(angle) * this.config.size, Math.sin(angle) * this.config.size);
+        }
+      } else {
+        // Diamond for others
+        ctx.moveTo(0, this.config.size);
+        ctx.lineTo(this.config.size, 0);
+        ctx.lineTo(0, -this.config.size);
+        ctx.lineTo(-this.config.size, 0);
+      }
       ctx.closePath();
 
       ctx.fillStyle = this.config.color;
@@ -193,6 +270,16 @@ export class Enemy {
       ctx.arc(0, 0, this.config.size / 3, 0, Math.PI * 2);
       ctx.fillStyle = '#fff';
       ctx.fill();
+    }
+
+    // Health Bar
+    if (this.hp < this.maxHp) {
+      const barWidth = this.config.size * 1.5;
+      const barHeight = 4;
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx.fillRect(-barWidth / 2, -this.config.size - 10, barWidth, barHeight);
+      ctx.fillStyle = this.hp / this.maxHp > 0.5 ? '#10b981' : this.hp / this.maxHp > 0.2 ? '#f59e0b' : '#ef4444';
+      ctx.fillRect(-barWidth / 2, -this.config.size - 10, barWidth * (this.hp / this.maxHp), barHeight);
     }
 
     ctx.restore();
@@ -271,6 +358,25 @@ export class Powerup {
       ctx.bezierCurveTo(-8, -7, -4, -8, 0, -4);
       ctx.bezierCurveTo(4, -8, 8, -7, 8, -3);
       ctx.bezierCurveTo(8, 0, 5, 4, 0, 8);
+      ctx.stroke();
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+    } else if (this.type === 'DAMAGE_BOOST') {
+      // Swords icon
+      ctx.beginPath();
+      ctx.moveTo(-6, 6);
+      ctx.lineTo(6, -6);
+      ctx.moveTo(6, 6);
+      ctx.lineTo(-6, -6);
+      ctx.stroke();
+    } else if (this.type === 'GOLDEN_STAR') {
+      // Star icon
+      ctx.beginPath();
+      for (let i = 0; i < 5; i++) {
+        const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+        ctx.lineTo(Math.cos(angle) * 8, Math.sin(angle) * 8);
+      }
+      ctx.closePath();
       ctx.stroke();
       ctx.fillStyle = '#fff';
       ctx.fill();

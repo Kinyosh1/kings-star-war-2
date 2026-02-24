@@ -19,7 +19,9 @@ import {
   Info,
   ChevronRight,
   X,
-  Languages
+  Languages,
+  Swords,
+  Star
 } from 'lucide-react';
 import { useGameEngine } from './useGameEngine';
 import { Achievement } from './types';
@@ -116,12 +118,20 @@ export default function App() {
               <span className="text-2xl font-display font-bold text-glow">{stats.score.toLocaleString()}</span>
             </div>
             <div className="flex gap-2">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <Heart 
-                  key={i} 
-                  className={`w-6 h-6 transition-all ${i < stats.lives ? 'text-red-500 fill-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]' : 'text-white/20'}`} 
-                />
-              ))}
+              {Array.from({ length: stats.maxLives }).map((_, i) => {
+                const fillAmount = Math.max(0, Math.min(1, stats.lives - i));
+                return (
+                  <div key={i} className="relative w-6 h-6">
+                    <Heart className="absolute inset-0 w-6 h-6 text-white/20" />
+                    <div 
+                      className="absolute inset-0 overflow-hidden transition-all duration-300" 
+                      style={{ width: `${fillAmount * 100}%` }}
+                    >
+                      <Heart className="w-6 h-6 text-red-500 fill-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -335,24 +345,38 @@ export default function App() {
                   <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-4">{t.enemyClasses}</h3>
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 bg-blue-500 rounded-sm rotate-45 border border-white/50" />
+                      <img src="/enemy_basic.png" className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" alt="" />
                       <div>
                         <p className="text-sm font-bold uppercase">{t.striker}</p>
                         <p className="text-[10px] text-white/50">{t.strikerDesc}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 bg-yellow-400 rounded-sm rotate-45 border border-white/50" />
+                      <img src="/enemy_fast.png" className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" alt="" />
                       <div>
                         <p className="text-sm font-bold uppercase">{t.interceptor}</p>
                         <p className="text-[10px] text-white/50">{t.interceptorDesc}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 bg-red-500 rounded-sm rotate-45 border border-white/50" />
+                      <img src="/enemy_heavy.png" className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]" alt="" />
                       <div>
                         <p className="text-sm font-bold uppercase">{t.dreadnought}</p>
                         <p className="text-[10px] text-white/50">{t.dreadnoughtDesc}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <img src="/enemy_kamikaze.png" className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]" alt="" />
+                      <div>
+                        <p className="text-sm font-bold uppercase">{t.kamikaze}</p>
+                        <p className="text-[10px] text-white/50">{t.kamikazeDesc}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <img src="/enemy_shooter.png" className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]" alt="" />
+                      <div>
+                        <p className="text-sm font-bold uppercase">{t.destroyer}</p>
+                        <p className="text-[10px] text-white/50">{t.destroyerDesc}</p>
                       </div>
                     </div>
                   </div>
@@ -386,6 +410,24 @@ export default function App() {
                       <div>
                         <p className="text-sm font-bold uppercase">{t.repair}</p>
                         <p className="text-[10px] text-white/50">{t.repairDesc}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-amber-500/20 border border-amber-500/40 rounded-lg flex items-center justify-center">
+                        <Swords className="w-5 h-5 text-amber-500" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold uppercase">{t.damageBoost}</p>
+                        <p className="text-[10px] text-white/50">{t.damageBoostDesc}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-amber-400/20 border border-amber-400/40 rounded-lg flex items-center justify-center">
+                        <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold uppercase">{t.goldenStar}</p>
+                        <p className="text-[10px] text-white/50">{t.goldenStarDesc}</p>
                       </div>
                     </div>
                   </div>
