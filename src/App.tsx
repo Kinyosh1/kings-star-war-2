@@ -336,107 +336,88 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/60 backdrop-blur-md overflow-y-auto"
+            className="fixed inset-0 z-[100] overflow-y-auto bg-black/60 backdrop-blur-md"
           >
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="glass-dark w-full max-w-6xl p-8 md:p-12 rounded-[3rem] relative"
-            >
-              <button 
-                onClick={() => setShowSidebar(false)}
-                className="absolute top-6 left-6 p-2 text-white/40 hover:text-white hover:bg-white/10 rounded-full transition-all"
+            {/* Wrapper to handle centering without cutting off top content */}
+            <div className="flex min-h-full items-center justify-center p-4 md:p-8">
+              <motion.div
+                initial={{ scale: 0.9, y: 20 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.9, y: 20 }}
+                className="glass-dark w-full max-w-4xl p-8 md:p-12 rounded-[3rem] relative my-auto"
               >
-                <X className="w-6 h-6" />
-              </button>
-              
-              <div className="text-center mb-10">
-                <h2 className="text-3xl md:text-4xl font-display font-bold text-blue-400 uppercase tracking-tighter">{t.missionIntel}</h2>
-                <div className="h-1 w-20 bg-blue-500 mx-auto mt-2 rounded-full" />
-              </div>
-              
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                {/* Column 1: Enemies */}
-                <div className="space-y-6">
-                  <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest border-b border-white/10 pb-2">{t.enemyClasses}</h3>
-                  <div className="space-y-5">
-                    {[
-                      { img: '/enemy_basic.png', name: t.striker, desc: t.strikerDesc, color: 'rgba(59,130,246,0.5)' },
-                      { img: '/enemy_fast.png', name: t.interceptor, desc: t.interceptorDesc, color: 'rgba(16,185,129,0.5)' },
-                      { img: '/enemy_heavy.png', name: t.dreadnought, desc: t.dreadnoughtDesc, color: 'rgba(168,85,247,0.5)' },
-                      { img: '/enemy_kamikaze.png', name: t.kamikaze, desc: t.kamikazeDesc, color: 'rgba(249,115,22,0.5)' },
-                      { img: '/enemy_shooter.png', name: t.destroyer, desc: t.destroyerDesc, color: 'rgba(239,68,68,0.5)' },
-                    ].map((enemy, i) => (
-                      <div key={i} className="flex items-center gap-4 group">
-                        <div className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-xl group-hover:bg-white/10 transition-colors">
-                          <img src={enemy.img} className="w-8 h-8 object-contain" style={{ filter: `drop-shadow(0 0 8px ${enemy.color})` }} alt="" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold uppercase text-white/90">{enemy.name}</p>
-                          <p className="text-[10px] text-white/50 leading-tight">{enemy.desc}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                <button 
+                  onClick={() => setShowSidebar(false)}
+                  className="absolute top-6 left-6 p-2 text-white/40 hover:text-white hover:bg-white/10 rounded-full transition-all z-10"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+                
+                <div className="text-center mb-10 pt-4 md:pt-0">
+                  <h2 className="text-3xl md:text-4xl font-display font-bold text-blue-400 uppercase tracking-tighter">{t.missionIntel}</h2>
+                  <div className="h-1 w-20 bg-blue-500 mx-auto mt-2 rounded-full" />
                 </div>
-
-                {/* Column 2: Powerups */}
-                <div className="space-y-6">
-                  <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest border-b border-white/10 pb-2">{t.powerupClasses}</h3>
-                  <div className="space-y-5">
-                    {[
-                      { icon: Zap, name: t.tripleShot, desc: t.tripleShotDesc, bg: 'bg-emerald-500/20', border: 'border-emerald-500/40', text: 'text-emerald-500' },
-                      { icon: Shield, name: t.shield, desc: t.shieldDesc, bg: 'bg-violet-500/20', border: 'border-violet-500/40', text: 'text-violet-500' },
-                      { icon: Heart, name: t.repair, desc: t.repairDesc, bg: 'bg-red-500/20', border: 'border-red-500/40', text: 'text-red-500' },
-                      { icon: Swords, name: t.damageBoost, desc: t.damageBoostDesc, bg: 'bg-amber-500/20', border: 'border-amber-500/40', text: 'text-amber-500' },
-                      { icon: Star, name: t.goldenStar, desc: t.goldenStarDesc, bg: 'bg-amber-400/20', border: 'border-amber-400/40', text: 'text-amber-400', fill: true },
-                    ].map((pw, i) => (
-                      <div key={i} className="flex items-center gap-4 group">
-                        <div className={`w-12 h-12 ${pw.bg} border ${pw.border} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                          <pw.icon className={`w-6 h-6 ${pw.text} ${pw.fill ? 'fill-current' : ''}`} />
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                  {/* Column 1: Enemies */}
+                  <div className="space-y-6">
+                    <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest border-b border-white/10 pb-2">{t.enemyClasses}</h3>
+                    <div className="space-y-5">
+                      {[
+                        { img: '/enemy_basic.png', name: t.striker, desc: t.strikerDesc, color: 'rgba(59,130,246,0.5)' },
+                        { img: '/enemy_fast.png', name: t.interceptor, desc: t.interceptorDesc, color: 'rgba(16,185,129,0.5)' },
+                        { img: '/enemy_heavy.png', name: t.dreadnought, desc: t.dreadnoughtDesc, color: 'rgba(168,85,247,0.5)' },
+                        { img: '/enemy_kamikaze.png', name: t.kamikaze, desc: t.kamikazeDesc, color: 'rgba(249,115,22,0.5)' },
+                        { img: '/enemy_shooter.png', name: t.destroyer, desc: t.destroyerDesc, color: 'rgba(239,68,68,0.5)' },
+                      ].map((enemy, i) => (
+                        <div key={i} className="flex items-center gap-4 group">
+                          <div className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-xl group-hover:bg-white/10 transition-colors shrink-0">
+                            <img src={enemy.img} className="w-8 h-8 object-contain" style={{ filter: `drop-shadow(0 0 8px ${enemy.color})` }} alt="" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold uppercase text-white/90">{enemy.name}</p>
+                            <p className="text-[10px] text-white/50 leading-tight">{enemy.desc}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-sm font-bold uppercase text-white/90">{pw.name}</p>
-                          <p className="text-[10px] text-white/50 leading-tight">{pw.desc}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Column 3: Tactical */}
-                <div className="space-y-6">
-                  <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest border-b border-white/10 pb-2">{t.tacticalInfo}</h3>
-                  <div className="glass-dark p-6 rounded-2xl">
-                    <ul className="text-xs text-white/70 space-y-4 list-none">
-                      {[t.tactical1, t.tactical2, t.tactical3, t.tactical4].map((text, i) => (
-                        <li key={i} className="flex gap-3">
-                          <span className="text-blue-500 font-bold">{i + 1}.</span>
-                          <span className="leading-relaxed">{text}</span>
-                        </li>
                       ))}
-                    </ul>
+                    </div>
                   </div>
-                  <div className="p-6 border border-white/5 rounded-2xl bg-white/2">
-                    <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2">System Status</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-[10px] text-blue-400 font-mono">ENCRYPTION: ACTIVE</span>
-                      <span className="text-[10px] text-emerald-400 font-mono">SIGNAL: STABLE</span>
+
+                  {/* Column 2: Powerups */}
+                  <div className="space-y-6">
+                    <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest border-b border-white/10 pb-2">{t.powerupClasses}</h3>
+                    <div className="space-y-5">
+                      {[
+                        { icon: Zap, name: t.tripleShot, desc: t.tripleShotDesc, bg: 'bg-emerald-500/20', border: 'border-emerald-500/40', text: 'text-emerald-500' },
+                        { icon: Shield, name: t.shield, desc: t.shieldDesc, bg: 'bg-violet-500/20', border: 'border-violet-500/40', text: 'text-violet-500' },
+                        { icon: Heart, name: t.repair, desc: t.repairDesc, bg: 'bg-red-500/20', border: 'border-red-500/40', text: 'text-red-500' },
+                        { icon: Swords, name: t.damageBoost, desc: t.damageBoostDesc, bg: 'bg-amber-500/20', border: 'border-amber-500/40', text: 'text-amber-500' },
+                        { icon: Star, name: t.goldenStar, desc: t.goldenStarDesc, bg: 'bg-amber-400/20', border: 'border-amber-400/40', text: 'text-amber-400', fill: true },
+                      ].map((pw, i) => (
+                        <div key={i} className="flex items-center gap-4 group">
+                          <div className={`w-12 h-12 ${pw.bg} border ${pw.border} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shrink-0`}>
+                            <pw.icon className={`w-6 h-6 ${pw.text} ${pw.fill ? 'fill-current' : ''}`} />
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold uppercase text-white/90">{pw.name}</p>
+                            <p className="text-[10px] text-white/50 leading-tight">{pw.desc}</p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="mt-12 flex justify-center">
-                <button 
-                  onClick={() => setShowSidebar(false)}
-                  className="btn-primary px-12 py-3 text-sm uppercase tracking-widest"
-                >
-                  {t.resume}
-                </button>
-              </div>
-            </motion.div>
+                <div className="mt-12 flex justify-center">
+                  <button 
+                    onClick={() => setShowSidebar(false)}
+                    className="btn-primary px-12 py-3 text-sm uppercase tracking-widest"
+                  >
+                    {t.resume}
+                  </button>
+                </div>
+              </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
