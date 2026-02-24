@@ -62,6 +62,7 @@ export default function App() {
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (gameState !== 'PLAYING' || !playerRef.current) return;
+    if (e.cancelable) e.preventDefault();
     const touch = e.touches[0];
     playerRef.current.x = touch.clientX;
     playerRef.current.y = touch.clientY - 50; // Offset for finger visibility
@@ -83,8 +84,9 @@ export default function App() {
       {/* Game Canvas */}
       <canvas 
         ref={canvasRef} 
-        className="block w-full h-full cursor-none"
+        className="block w-full h-full cursor-none touch-none"
         onTouchMove={handleTouchMove}
+        onTouchStart={(e) => e.cancelable && e.preventDefault()}
       />
 
       {/* Achievement Popup */}
