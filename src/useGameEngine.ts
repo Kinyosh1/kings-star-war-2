@@ -333,9 +333,8 @@ export function useGameEngine() {
         }
       }
 
-      // Escape penalty
+      // Remove enemy if off screen
       if (enemy.y > canvas.height + enemy.config.size) {
-        setStats(prev => ({ ...prev, score: Math.max(0, prev.score - 50) }));
         return false;
       }
 
